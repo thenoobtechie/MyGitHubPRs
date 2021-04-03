@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">MyGitCPRs</string>
+    <string name="owner">Owner</string>
+    <string name="repository">Repository</string>
+    <string name="list_repos">List Repositories</string>
+    <string name="created_date_format">Created at: %1$s</string>
+    <string name="closed_date_format">Closed at: %1$s</string>
+
+    <array name="sortEntries">
+        <item>ASC</item>
+        <item>DESC</item>
+    </array>
+    <array name="filterEntries">
+        <item>All</item>
+        <item>Open</item>
+        <item>Closed</item>
+    </array>
+</resources>
