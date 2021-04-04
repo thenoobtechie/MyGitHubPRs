@@ -7,6 +7,7 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -33,12 +34,10 @@ interface ApiService {
 
     @GET("/repos/{owner}/{repo}/pulls")
     fun listRepos(
-        @Path("owner") owner: String?,
-        @Path("repo") repo: String?,
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
         @Query("state") status: String = "closed",
         @Query("sort") sort: String = "created",
-        @Query("direction") sortDirection: String = "desc",
-        @Query("per_page") perPage: Int = 100,
-        @Query("page") page: Int = 0
+        @Query("direction") sortDirection: String = "desc"
     ): Call<List<CPRModel>?>?
 }
