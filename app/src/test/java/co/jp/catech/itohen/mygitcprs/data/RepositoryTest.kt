@@ -25,7 +25,7 @@ class RepositoryTest : TestCase() {
         val liveData = mock<MutableLiveData<Response<List<CPRModel>?>>>()
         val repo = Repository(service)
 
-        repo.fetchPrList(testUserName, testRepo, testState, callback = object : Callback<List<CPRModel>?> {
+        repo.fetchPrList(testUserName, testRepo, testState, sortDirection = "desc", callback = object : Callback<List<CPRModel>?> {
             override fun onResponse(
                 call: Call<List<CPRModel>?>,
                 response: Response<List<CPRModel>?>
