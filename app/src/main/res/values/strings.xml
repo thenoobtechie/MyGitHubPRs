@@ -5,6 +5,7 @@
     <string name="list_repos">List Repositories</string>
     <string name="created_date_format">Created at: %1$s</string>
     <string name="closed_date_format">Closed at: %1$s</string>
+    <string name="fill_in_reqd_fields">Please fill in required fields</string>
 
     <array name="sortEntries">
         <item>ASC</item>

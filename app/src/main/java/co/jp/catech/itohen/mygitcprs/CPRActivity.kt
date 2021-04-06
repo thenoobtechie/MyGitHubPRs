@@ -13,33 +13,38 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import co.jp.catech.itohen.mygitcprs.adapter.CPRListAdapter
-import co.jp.catech.itohen.mygitcprs.data.Repository
-import co.jp.catech.itohen.mygitcprs.network.ApiService
+import co.jp.catech.itohen.mygitcprs.data.CPRRepository
+import co.jp.catech.itohen.mygitcprs.data.RequestModel
+import co.jp.catech.itohen.mygitcprs.network.CPRApiService
+import co.jp.catech.itohen.mygitcprs.network.CPRApiCallbackHandler
 import co.jp.catech.itohen.mygitcprs.viewmodel.CPRDisplayModel
 import co.jp.catech.itohen.mygitcprs.viewmodel.CPRViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
+class CPRActivity : AppCompatActivity() {
 
-    lateinit var cprListAdapter: CPRListAdapter
+    private lateinit var cprListAdapter: CPRListAdapter
     private lateinit var cprViewModel: CPRViewModel
+    private val cprDisplayModelObserver = Observer<CPRDisplayModel?> { updateState(it) }
 
-    private val cprDisplayModelObserver = Observer<CPRDisplayModel?> {
+    private fun updateState(cprDisplayModel: CPRDisplayModel) {
 
-        if (it.showProgress) {
+        if (cprDisplayModel.showProgress) {
             progressCircular.visibility = VISIBLE
         } else {
-            progressCircular.visibility = GONE
-            if (it.data == null) {
+
+            if (cprDisplayModel.data == null) {
 
                 cprListAdapter.updateData(listOf())
-                if (it.message.isNotEmpty())
-                    Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+                if (cprDisplayModel.message.isNotEmpty())
+                    Toast.makeText(this, cprDisplayModel.message, Toast.LENGTH_SHORT).show()
 
             } else
-                cprListAdapter.updateData(it.data!!)
+                cprListAdapter.updateData(cprDisplayModel.data!!)
+
+            progressCircular.visibility = GONE
         }
     }
 
@@ -51,15 +56,14 @@ class MainActivity : AppCompatActivity() {
         initVars()
         initViews()
         startObserving()
-        fetchPrList()
+        fetchPRList()
     }
 
     private fun initVars() {
 
-
         cprViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return CPRViewModel(Repository(ApiService.getRetrofitService())) as T
+                return CPRViewModel(CPRRepository(CPRApiService.getRetrofitService())) as T
             }
         }).get(CPRViewModel::class.java)
     }
@@ -72,31 +76,31 @@ class MainActivity : AppCompatActivity() {
         sortSpinner.setSelection(1)
         filterSpinner.setSelection(2)
 
-        val itemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                fetchPrList()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+        val itemSelectedListener = getSpinnerItemSelectedListener()
         sortSpinner.onItemSelectedListener = itemSelectedListener
         filterSpinner.onItemSelectedListener = itemSelectedListener
 
         btnListRepos.setOnClickListener {
-            fetchPrList()
+            fetchPRList()
         }
+    }
+
+    private fun getSpinnerItemSelectedListener() = object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(
+            parent: AdapterView<*>?,
+            view: View?,
+            position: Int,
+            id: Long
+        ) {
+            fetchPRList()
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {}
     }
 
     private fun startObserving() {
 
-        if (cprViewModel.liveCPRDisplayModel.hasActiveObservers())
-            stopObserving()
-
+        stopObserving()
         cprViewModel.liveCPRDisplayModel.observe(this, cprDisplayModelObserver)
     }
 
@@ -107,13 +111,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
 
-        cprViewModel.liveCPRDisplayModel.removeObserver(cprDisplayModelObserver)
+        stopObserving()
         super.onDestroy()
     }
 
-    private fun fetchPrList() {
+    private fun fetchPRList() {
 
-        cprViewModel.fetchPrList(
+        cprViewModel.fetchPRList(getRequestModel())
+    }
+
+    private fun getRequestModel(): RequestModel {
+        return RequestModel(
             etUserSearchView.text.toString(),
             etRepoSearchView.text.toString(),
             filterSpinner.selectedItem.toString().toLowerCase(Locale.getDefault()),

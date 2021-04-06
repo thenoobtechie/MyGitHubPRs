@@ -2,7 +2,8 @@ package co.jp.catech.itohen.mygitcprs.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import co.jp.catech.itohen.mygitcprs.MainCoroutineRule
-import co.jp.catech.itohen.mygitcprs.data.Repository
+import co.jp.catech.itohen.mygitcprs.data.CPRRepository
+import co.jp.catech.itohen.mygitcprs.data.RequestModel
 import co.jp.catech.itohen.mygitcprs.getOrAwaitValueTest
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -13,7 +14,7 @@ import org.junit.Rule
 
 class CPRViewModelTest : TestCase() {
 
-    private lateinit var mockRepo: Repository
+    private lateinit var mockRepo: CPRRepository
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -52,22 +53,22 @@ class CPRViewModelTest : TestCase() {
     }
     fun testFetchPrList_emptyRepo() {
         val viewmodel = CPRViewModel(mock())
-        viewmodel.fetchPrList("xyz", "")
-        verify(viewmodel.invalidDataError())
+        viewmodel.fetchPRList(RequestModel("xyz", ""))
+        verify(viewmodel.invalidRequestError("validationData.second"))
     }
     fun testFetchPrList_emptyOwnerRepo() {
         val viewmodel = CPRViewModel(mock())
-        viewmodel.fetchPrList("", "")
-        verify(viewmodel.invalidDataError())
+        viewmodel.fetchPRList(RequestModel("", ""))
+        verify(viewmodel.invalidRequestError("validationData.second"))
     }
     fun testFetchPrList_correctData() {
 
         val userName = "xyz"
         val repoName = "xyz"
-        val repo = mock<Repository>()
+        val repo = mock<CPRRepository>()
         val viewmodel = CPRViewModel(repo)
-        viewmodel.fetchPrList(userName, repoName)
-        verify(viewmodel).fetchPrList(userName, repoName)
+        viewmodel.fetchPRList(RequestModel("", ""))
+        verify(viewmodel).fetchPRList(RequestModel("", ""))
     }
 
     fun testInvalidDataError() {}
