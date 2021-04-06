@@ -5,9 +5,10 @@ repository of your own code.
 UI should include : Title, Created date, closed date, userName, user Image
 
 Showing a list of Pull requests from github with Username, RepoName as query parameters
+Search is provided via owner and repo
+Filter by status and sorting by created date
 Written in kotlin using MVVM architecture
 Retrofit used for Api calls
-Filter by status and sorting by created date
 
 //TODO Add pagination, Filter/Search by user, Sort by name
 
