@@ -9,6 +9,8 @@ Written in kotlin using MVVM architecture
 Retrofit used for Api calls
 Filter by status and sorting by created date
 
+//TODO Add pagination, Filter/Search by user, Sort by name
+
 Pre-requisites:
 Android studio v4+
 Java v1.8+
