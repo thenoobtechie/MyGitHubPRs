@@ -3,6 +3,7 @@ package co.jp.catech.itohen.mygitcprs.adapter
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 
+//TODO fixme
 abstract class CustomScrollListener: RecyclerView.OnScrollListener() {
 
     private val hideThreshHold = 20

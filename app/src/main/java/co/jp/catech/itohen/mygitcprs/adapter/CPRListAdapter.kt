@@ -1,16 +1,14 @@
 package co.jp.catech.itohen.mygitcprs.adapter
 
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import co.jp.catech.itohen.mygitcprs.Constants.Companion.DISPLAY_DATE_FORMAT
 import co.jp.catech.itohen.mygitcprs.R
 import co.jp.catech.itohen.mygitcprs.Utility
 import co.jp.catech.itohen.mygitcprs.data.CPRModel
 import kotlinx.android.synthetic.main.layout_cpr_list_item.view.*
-import java.net.URL
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -19,12 +17,12 @@ class CPRListAdapter(var cPRList: List<CPRModel>): RecyclerView.Adapter<CPRViewH
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CPRViewHolder {
 
-        val view = LayoutInflater.from(parent.context).inflate(
+        val cprListItemView = LayoutInflater.from(parent.context).inflate(
             R.layout.layout_cpr_list_item,
             parent,
             false
         )
-        return CPRViewHolder(view);
+        return CPRViewHolder(cprListItemView)
     }
 
     override fun onBindViewHolder(holder: CPRViewHolder, position: Int) {
@@ -42,7 +40,7 @@ class CPRListAdapter(var cPRList: List<CPRModel>): RecyclerView.Adapter<CPRViewH
 
 class CPRViewHolder(view: View): RecyclerView.ViewHolder(view) {
 
-    private val dateFormat = SimpleDateFormat(Utility.displayDateFormat, Locale.getDefault())
+    private val dateFormat = SimpleDateFormat(DISPLAY_DATE_FORMAT, Locale.getDefault())
 
     fun bind(cPRItem: CPRModel) {
         itemView.tvTitle.text = cPRItem.title

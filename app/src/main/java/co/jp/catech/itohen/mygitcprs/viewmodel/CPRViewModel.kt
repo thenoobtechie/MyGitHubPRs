@@ -1,47 +1,62 @@
 package co.jp.catech.itohen.mygitcprs.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import co.jp.catech.itohen.mygitcprs.Constants.Companion.API_RESPONSE_LOG_TAG
+import co.jp.catech.itohen.mygitcprs.Constants.Companion.INVALID_REQUEST_ERROR
 import co.jp.catech.itohen.mygitcprs.data.CPRModel
-import co.jp.catech.itohen.mygitcprs.data.Repository
-import co.jp.catech.itohen.mygitcprs.network.ApiService
+import co.jp.catech.itohen.mygitcprs.data.CPRRepository
+import co.jp.catech.itohen.mygitcprs.data.RequestModel
+import co.jp.catech.itohen.mygitcprs.network.CPRApiCallbackHandler
+import co.jp.catech.itohen.mygitcprs.network.CPRApiService
 import retrofit2.Response
 
-class CPRViewModel : ViewModel() {
+class CPRViewModel(private val cPRRepository: CPRRepository) : ViewModel() {
 
-    var liveCPRDisplayModel = MutableLiveData<CPRDisplayModel>()
-    var repo = Repository()
+    val liveCPRDisplayModel =
+        MutableLiveData<CPRDisplayModel>()
 
-    private val responseObserver = Observer<Response<List<CPRModel>?>> { response ->
-
-        val dataModel: CPRDisplayModel = if(response.code() == ApiService.success) {
-            CPRDisplayModel(success = true, showProgress = false, data = response.body())
+    private val fnUpdateData = fun(response: Response<List<CPRModel>?>) {
+        Log.v(
+            API_RESPONSE_LOG_TAG,
+            "Data fetch completed, Response-isSuccess : ${response.isSuccessful}"
+        )
+        val dataModel: CPRDisplayModel = if (response.code() == CPRApiService.success) {
+            CPRDisplayModel(data = response.body())
         } else {
-            CPRDisplayModel(success = false, showProgress = false, message = response.message())
+            CPRDisplayModel(message = response.message())
         }
         liveCPRDisplayModel.postValue(dataModel)
     }
 
-    init {
-        repo.liveData.observeForever(responseObserver)
-    }
+    private val cprApiCallbackHandler: CPRApiCallbackHandler =
+        CPRApiCallbackHandler(updateLiveData = fnUpdateData)
 
-    fun fetchPrList(owner: String, repoName: String, prStatus: String, sort: String = "created", sortDirection: String = "desc", page: Int = 0, perPage: Int = 50) {
+    fun fetchPRList(
+        requestModel: RequestModel
+    ) {
 
-        if(owner.isNotBlank() && repoName.isNotBlank()) {
+        val validationData = requestModel.validateData()
+        if (validationData.first) {
+
             liveCPRDisplayModel.postValue(CPRDisplayModel(showProgress = true))
-            repo.fetchPrList(owner, repoName, prStatus, sort = sort, sortDirection = sortDirection, page = page, perPage = perPage)
+            Log.v(API_RESPONSE_LOG_TAG, validationData.second)
+            cPRRepository.fetchPrList(requestModel, callback = cprApiCallbackHandler)
+        } else {
+            Log.v(API_RESPONSE_LOG_TAG, INVALID_REQUEST_ERROR)
+            invalidRequestError(errorMessage = validationData.second)
         }
-        else
-            liveCPRDisplayModel.postValue(CPRDisplayModel(message = "Please fill in required fields"))
     }
 
-    override fun onCleared() {
-        repo.liveData.removeObserver(responseObserver)
-        super.onCleared()
+    fun invalidRequestError(errorMessage: String) {
+
+        liveCPRDisplayModel.postValue(CPRDisplayModel(message = errorMessage))
     }
 }
 
-//Model for the activity screen
-class CPRDisplayModel(var success: Boolean = false, var showProgress: Boolean = false, var data: List<CPRModel>? = null, var message: String = "")
+class CPRDisplayModel(
+    var showProgress: Boolean = false,
+    var data: List<CPRModel>? = null,
+    var message: String = ""
+)

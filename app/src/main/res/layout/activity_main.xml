@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".CPRActivity">
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/header"
@@ -28,7 +28,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:hint="@string/owner"
-        android:text="envoyproxy"
+        android:text="thenoobtechie"
         android:padding="8dp"
         android:textColor="@color/black"
         android:background="@drawable/rounded_rect_shape_edittext"
@@ -46,7 +46,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:hint="@string/repository"
-        android:text="envoy"
+        android:text="mygithubprs"
         android:textColor="@color/black"
         android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
